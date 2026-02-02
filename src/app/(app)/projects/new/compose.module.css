@@ -1,0 +1,107 @@
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    min-height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.titleInput {
+    width: 100%;
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fff;
+    outline: none;
+    font-family: var(--font-primary);
+    margin-bottom: 1rem;
+}
+
+.titleInput::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.descInput {
+    width: 100%;
+    background: transparent;
+    border: none;
+    font-size: 1.1rem;
+    color: #ddd;
+    outline: none;
+    font-family: var(--font-primary);
+    resize: none;
+    line-height: 1.6;
+    min-height: 200px;
+}
+
+.descInput::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.metaSection {
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.inputGroup {
+    position: relative;
+}
+
+.metaInput {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem 1rem 1rem 2.5rem;
+    /* Space for icon */
+    color: #fff;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.metaInput:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-primary);
+}
+
+.inputIcon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.publishBtn {
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 1rem;
+    border-radius: 99px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.publishBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.publishBtn:not(:disabled):hover {
+    transform: scale(1.02);
+}
