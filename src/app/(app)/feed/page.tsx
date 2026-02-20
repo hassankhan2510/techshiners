@@ -55,6 +55,8 @@ async function getProjects(type?: string) {
 export default async function FeedPage({ searchParams }: { searchParams: { type?: string } }) {
     const { type } = searchParams || {}
     const currentType = type || 'all'
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
     const projects = await getProjects(currentType)
 
     return (
@@ -92,9 +94,8 @@ export default async function FeedPage({ searchParams }: { searchParams: { type?
                 </div>
             )}
 
-
             {projects.map((project: any) => (
-                <ProjectCard key={project.id} project={project} />
+                <ProjectCard key={project.id} project={project} currentUserId={user?.id} />
             ))}
         </div>
     )

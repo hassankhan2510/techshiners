@@ -101,3 +101,54 @@ export async function searchProjects(term: string, university: string) {
 
     return projects
 }
+
+export async function searchPeople(term: string, university: string) {
+    const supabase = await createClient()
+
+    let query = supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url, university, role')
+        .order('full_name', { ascending: true })
+
+    if (term) {
+        query = query.ilike('full_name', `%${term}%`)
+    }
+
+    if (university) {
+        query = query.eq('university', university)
+    }
+
+    const { data, error } = await query.limit(50)
+
+    if (error) {
+        console.error('Search people error:', error)
+        return []
+    }
+
+    return data || []
+}
+
+export async function getUniversityStats() {
+    const supabase = await createClient()
+
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('university')
+
+    if (error) {
+        console.error('University stats error:', error)
+        return []
+    }
+
+    // Count unique universities
+    const counts: Record<string, number> = {}
+    for (const p of data || []) {
+        if (p.university) {
+            counts[p.university] = (counts[p.university] || 0) + 1
+        }
+    }
+
+    return Object.entries(counts)
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count)
+}

@@ -1,14 +1,15 @@
 import styles from './nav.module.css'
+import ThemeToggle from './theme-toggle'
 
 export default function TopNav() {
     return (
         <nav className={styles.topNav}>
             <div className={styles.brandLogo}>
-                {/* Simple Vector Logo or Wordmark */}
                 TechShin<span style={{ color: 'var(--accent-primary)' }}>ers</span>
             </div>
 
             <div className={styles.topActions}>
+                <ThemeToggle />
                 <div className={styles.navIcon}>
                     {/* Bell - Notification */}
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

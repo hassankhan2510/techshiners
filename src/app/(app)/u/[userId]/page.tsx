@@ -86,6 +86,23 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                     <p style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.5rem' }}>
                         {profile.role?.toUpperCase()}
                     </p>
+
+                    {profile.cv_url && (
+                        <a
+                            href={profile.cv_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                                display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                                marginTop: '1rem', padding: '0.5rem 1.25rem',
+                                background: '#0095f6', color: '#fff',
+                                borderRadius: '20px', textDecoration: 'none',
+                                fontSize: '0.9rem', fontWeight: 600,
+                            }}
+                        >
+                            📄 Download CV
+                        </a>
+                    )}
                 </div>
             </div>
 
@@ -94,7 +111,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             <div className={styles.feedContainer}>
                 {projects && projects.length > 0 ? (
                     projects.map((project: any) => (
-                        <ProjectCard key={project.id} project={project} />
+                        <ProjectCard key={project.id} project={project} currentUserId={currentUser?.id} />
                     ))
                 ) : (
                     <div style={{ textAlign: 'center', color: '#666', padding: '3rem' }}>

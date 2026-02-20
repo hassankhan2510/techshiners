@@ -2,11 +2,10 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background: #000;
-    /* Deep black for Oled feel */
+    background: var(--bg-primary);
     padding-bottom: calc(56px + env(safe-area-inset-bottom));
-    /* More compact */
     padding-top: 56px;
+    transition: background 0.3s ease;
 }
 
 /* Top Nav */
@@ -16,23 +15,23 @@
     left: 0;
     width: 100%;
     height: 56px;
-    background: rgba(0, 0, 0, 0.85);
+    background: color-mix(in srgb, var(--bg-primary) 85%, transparent);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    /* Faint border */
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 1rem;
     z-index: 100;
+    transition: background 0.3s ease;
 }
 
 .brandLogo {
     font-weight: 800;
     font-size: 1.25rem;
     letter-spacing: -0.03em;
-    color: #fff;
+    color: var(--text-primary);
     font-family: var(--font-primary);
 }
 
@@ -42,7 +41,7 @@
 }
 
 .navIcon {
-    color: #fff;
+    color: var(--text-primary);
     opacity: 0.8;
     cursor: pointer;
     transition: opacity 0.2s;
@@ -59,17 +58,17 @@
     left: 0;
     width: 100%;
     height: calc(56px + env(safe-area-inset-bottom));
-    background: rgba(0, 0, 0, 0.9);
+    background: color-mix(in srgb, var(--bg-primary) 90%, transparent);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid var(--border-color);
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    /* 5 items evenly spaced */
     align-items: center;
     justify-items: center;
     z-index: 100;
     padding-bottom: env(safe-area-inset-bottom);
+    transition: background 0.3s ease;
 }
 
 .navItem {
@@ -77,8 +76,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: rgba(255, 255, 255, 0.5);
-    /* Dim inactive state */
+    color: var(--text-muted);
     text-decoration: none;
     width: 100%;
     height: 100%;
@@ -86,8 +84,7 @@
 }
 
 .navItem.active {
-    color: #fff;
-    /* Bright active state */
+    color: var(--text-primary);
 }
 
 .iconSvg {

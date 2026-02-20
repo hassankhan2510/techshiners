@@ -116,3 +116,103 @@ export async function getProfile() {
 
     return newProfile
 }
+
+export async function uploadCV(formData: FormData) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) return { error: 'Not authenticated' }
+
+    const file = formData.get('cv') as File
+    if (!file || file.size === 0) return { error: 'No file selected' }
+
+    // Max 5MB
+    if (file.size > 5 * 1024 * 1024) return { error: 'File too large (max 5MB)' }
+
+    const ext = file.name.split('.').pop()
+    const filePath = `${user.id}/cv.${ext}`
+
+    const { error: uploadError } = await supabase.storage
+        .from('cvs')
+        .upload(filePath, file, { upsert: true })
+
+    if (uploadError) {
+        console.error('CV upload error:', uploadError)
+        return { error: 'Upload failed: ' + uploadError.message }
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+        .from('cvs')
+        .getPublicUrl(filePath)
+
+    const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ cv_url: publicUrl })
+        .eq('id', user.id)
+
+    if (updateError) {
+        console.error('CV URL update error:', updateError)
+        return { error: 'Could not save CV link' }
+    }
+
+    revalidatePath('/profile')
+    return { success: 'CV uploaded successfully!' }
+}
+
+export async function deleteProject(projectId: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) return { error: 'Not authenticated' }
+
+    const { error } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', projectId)
+        .eq('user_id', user.id)
+
+    if (error) {
+        console.error('Delete project error:', error)
+        return { error: error.message }
+    }
+
+    revalidatePath('/feed')
+    return { success: true }
+}
+
+export async function contributeToProject(projectId: string, message: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) return { error: 'Not authenticated' }
+
+    const { error } = await supabase
+        .from('contributions')
+        .insert({
+            project_id: projectId,
+            user_id: user.id,
+            message: message || 'I want to contribute!'
+        })
+
+    if (error) {
+        if (error.code === '23505') return { error: 'You already sent a request' }
+        console.error('Contribute error:', error)
+        return { error: error.message }
+    }
+
+    revalidatePath('/feed')
+    return { success: true }
+}
+
+export async function getContributions(projectId: string) {
+    const supabase = await createClient()
+
+    const { data, error } = await supabase
+        .from('contributions')
+        .select(`*, profiles(full_name, avatar_url)`)
+        .eq('project_id', projectId)
+        .order('created_at', { ascending: false })
+
+    if (error) return []
+    return data || []
+}

@@ -9,10 +9,11 @@
 }
 
 .projectCard {
-    background: black;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 1rem;
     margin-bottom: 1rem;
+    transition: background 0.3s ease;
 }
 
 .cardHeader {
@@ -26,13 +27,13 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #222;
+    background: var(--input-bg);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
     overflow: hidden;
 }
 
@@ -45,7 +46,7 @@
 
 .userName {
     font-weight: 700;
-    color: #fff;
+    color: var(--text-primary);
     font-size: 0.95rem;
     display: flex;
     align-items: center;
@@ -54,7 +55,7 @@
 
 .userUni {
     font-size: 0.8rem;
-    color: #888;
+    color: var(--text-secondary);
 }
 
 /* Twitter Blue Style Badge */
@@ -66,7 +67,7 @@
 .moreBtn {
     background: none;
     border: none;
-    color: #666;
+    color: var(--text-muted);
     cursor: pointer;
     padding: 8px;
 }
@@ -74,14 +75,14 @@
 .projectImage {
     width: 100%;
     aspect-ratio: 16/9;
-    background: #111;
+    background: var(--bg-secondary);
     margin-bottom: 0.75rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #444;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .cardContent {
@@ -92,12 +93,12 @@
     font-size: 1.1rem;
     font-weight: 700;
     margin-bottom: 0.25rem;
-    color: #fff;
+    color: var(--text-primary);
     line-height: 1.3;
 }
 
 .projectDesc {
-    color: #ccc;
+    color: var(--text-secondary);
     font-size: 0.95rem;
     line-height: 1.5;
     margin-bottom: 0.75rem;
@@ -125,7 +126,7 @@
 .actionBtn {
     background: none;
     border: none;
-    color: #fff;
+    color: var(--text-primary);
     cursor: pointer;
     display: flex;
     align-items: center;

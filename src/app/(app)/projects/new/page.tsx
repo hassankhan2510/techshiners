@@ -1,17 +1,38 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, startTransition } from 'react'
 import { createProject, ProjectState } from '../actions'
 import styles from './compose.module.css'
+import { compressImage } from '@/utils/image-compression'
 
 const initialState: ProjectState = {}
 
 export default function NewProjectPage() {
     const [state, formAction, isPending] = useActionState(createProject, initialState)
 
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        const form = e.currentTarget
+        const formData = new FormData(form)
+
+        startTransition(async () => {
+            const file = formData.get('image') as File
+            if (file && file.size > 0) {
+                try {
+                    const compressed = await compressImage(file)
+                    formData.set('image', compressed)
+                } catch (err) {
+                    console.error("Compression failed, using original", err)
+                }
+            }
+
+            formAction(formData)
+        })
+    }
+
     return (
         <div className={styles.container}>
-            <form action={formAction} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
 
                 {/* Type Selector */}
                 <div style={{ padding: '1rem', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '1rem' }}>
@@ -40,9 +61,11 @@ export default function NewProjectPage() {
                         placeholder="What's on your mind? Tell us about your project, idea, or event..."
                     />
 
-                    {/* Image Upload Preview could go here, for now just simple input */}
+                    {/* Image Upload */}
                     <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#888' }}>Attachment (Image / Logo)</label>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#888' }}>
+                            📷 Attachment (Image / Logo) — <span style={{ color: '#0095f6' }}>Auto-Compressed</span>
+                        </label>
                         <input type="file" name="image" accept="image/*" style={{ color: '#ccc' }} />
                     </div>
                 </div>

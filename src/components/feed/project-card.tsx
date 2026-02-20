@@ -2,38 +2,100 @@
 
 import styles from './feed.module.css'
 import LikeButton from './like-button'
+import CommentSection from './comment-section'
 import { useState } from 'react'
+import Link from 'next/link'
+import { deleteProject, contributeToProject } from '@/app/(app)/profile/actions'
 
 interface ProjectCardProps {
-    project: any // Type this better in production
+    project: any
+    currentUserId?: string
 }
 
-export default function ProjectCard({ project }: ProjectCardProps) {
+export default function ProjectCard({ project, currentUserId }: ProjectCardProps) {
     const authorName = project.profiles?.full_name || 'Unknown User'
     const authorAvatar = project.profiles?.avatar_url || `https://api.dicebear.com/9.x/avataaars/svg?seed=${authorName}`
+    const [menuOpen, setMenuOpen] = useState(false)
+    const [deleted, setDeleted] = useState(false)
+    const [contribOpen, setContribOpen] = useState(false)
+    const [contribMsg, setContribMsg] = useState('')
+    const [contribSent, setContribSent] = useState(false)
+
+    const isOwner = currentUserId === project.user_id
+
+    const handleDelete = async () => {
+        if (!confirm('Delete this post permanently?')) return
+        const result = await deleteProject(project.id)
+        if (result.success) setDeleted(true)
+        else alert(result.error || 'Could not delete')
+        setMenuOpen(false)
+    }
+
+    const handleContribute = async () => {
+        const result = await contributeToProject(project.id, contribMsg)
+        if (result.success) {
+            setContribSent(true)
+            setContribOpen(false)
+        } else {
+            alert(result.error)
+        }
+    }
+
+    if (deleted) return null
 
     return (
         <div className={styles.projectCard}>
             {/* Header */}
             <div className={styles.cardHeader}>
-                <div className={styles.avatar}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={authorAvatar} alt="" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', background: '#222' }} />
-                </div>
+                <Link href={`/u/${project.user_id}`}>
+                    <div className={styles.avatar}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={authorAvatar} alt="" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', background: '#222' }} />
+                    </div>
+                </Link>
                 <div className={styles.userInfo}>
-                    <div className={styles.userName}>
+                    <Link href={`/u/${project.user_id}`} className={styles.userName} style={{ textDecoration: 'none', color: 'inherit' }}>
                         {authorName}
                         {project.verification_status === 'verified' && (
                             <svg className={styles.verifiedBadge} viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                                 <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
                             </svg>
                         )}
-                    </div>
+                    </Link>
                     <div className={styles.userUni}>{project.profiles?.university || 'No University'}</div>
                 </div>
-                <button className={styles.moreBtn}>
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle><circle cx="5" cy="12" r="2"></circle></svg>
-                </button>
+
+                {/* More Menu */}
+                <div style={{ position: 'relative' }}>
+                    <button className={styles.moreBtn} onClick={() => setMenuOpen(!menuOpen)}>
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle><circle cx="5" cy="12" r="2"></circle></svg>
+                    </button>
+                    {menuOpen && (
+                        <div style={{
+                            position: 'absolute', right: 0, top: '100%', zIndex: 10,
+                            background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '8px', overflow: 'hidden', minWidth: '150px',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
+                        }}>
+                            {isOwner && (
+                                <button onClick={handleDelete} style={{
+                                    display: 'block', width: '100%', padding: '0.75rem 1rem',
+                                    background: 'none', border: 'none', color: '#ff4444',
+                                    cursor: 'pointer', textAlign: 'left', fontSize: '0.9rem'
+                                }}>
+                                    🗑️ Delete Post
+                                </button>
+                            )}
+                            <button onClick={() => { setMenuOpen(false) }} style={{
+                                display: 'block', width: '100%', padding: '0.75rem 1rem',
+                                background: 'none', border: 'none', color: '#ccc',
+                                cursor: 'pointer', textAlign: 'left', fontSize: '0.9rem'
+                            }}>
+                                ✕ Close
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Content */}
@@ -46,7 +108,6 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                             alt={project.title}
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         />
-                        {/* Type Badge */}
                         {project.type && project.type !== 'project' && (
                             <span style={{
                                 position: 'absolute', top: '10px', right: '10px',
@@ -58,7 +119,6 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                         )}
                     </div>
                 ) : (
-                    /* Placeholder for actual image */
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#333', background: '#111' }}>
                         {project.type && project.type !== 'project' ? (
                             <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#444' }}>{project.type.toUpperCase()}</span>
@@ -74,6 +134,20 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             <div className={styles.cardContent}>
                 <h3 className={styles.projectTitle}>{project.title}</h3>
                 <DescriptionWithSeeMore text={project.description} />
+                {project.project_url && (
+                    <a
+                        href={project.project_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                            display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                            color: '#0095f6', textDecoration: 'none', fontSize: '0.85rem',
+                            marginTop: '0.5rem', marginBottom: '0.5rem'
+                        }}
+                    >
+                        🔗 {project.project_url.replace(/^https?:\/\//, '').slice(0, 40)}{project.project_url.length > 40 ? '...' : ''}
+                    </a>
+                )}
                 <div className={styles.tags}>
                     {project.skills && project.skills.map((tag: string) => (
                         <span key={tag} className={styles.tag}>#{tag}</span>
@@ -88,13 +162,59 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                     initialLikes={project.likes?.[0]?.count || 0}
                     initialHasLiked={!!project.is_liked}
                 />
-                <button className={styles.actionBtn}>
-                    <svg className={styles.actionIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-                    0
-                </button>
-                <button className={styles.actionBtn}>
-                    <svg className={styles.actionIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                </button>
+                {/* Contribute Button */}
+                {currentUserId && !isOwner && !contribSent && (
+                    <button
+                        onClick={() => setContribOpen(!contribOpen)}
+                        className={styles.actionBtn}
+                        style={{ color: contribOpen ? '#0095f6' : undefined }}
+                    >
+                        🤝 Contribute
+                    </button>
+                )}
+                {contribSent && (
+                    <span style={{ color: '#0095f6', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                        ✅ Request Sent
+                    </span>
+                )}
+            </div>
+
+            {/* Contribute Form */}
+            {contribOpen && (
+                <div style={{
+                    padding: '0.75rem 1rem',
+                    borderTop: '1px solid rgba(255,255,255,0.05)'
+                }}>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <input
+                            type="text"
+                            value={contribMsg}
+                            onChange={(e) => setContribMsg(e.target.value)}
+                            placeholder="How would you like to help?"
+                            style={{
+                                flex: 1, background: 'rgba(255,255,255,0.05)',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '20px', padding: '0.5rem 1rem',
+                                color: '#fff', fontSize: '0.85rem', outline: 'none'
+                            }}
+                        />
+                        <button
+                            onClick={handleContribute}
+                            style={{
+                                background: '#0095f6', color: '#fff', border: 'none',
+                                borderRadius: '20px', padding: '0.5rem 1rem',
+                                cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600,
+                            }}
+                        >
+                            Send
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Comments */}
+            <div style={{ padding: '0 1rem 0.75rem' }}>
+                <CommentSection projectId={project.id} currentUserId={currentUserId} />
             </div>
         </div>
     )
