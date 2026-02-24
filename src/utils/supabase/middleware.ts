@@ -44,9 +44,15 @@ export async function updateSession(request: NextRequest) {
 
     const { data: { user } } = await supabase.auth.getUser()
 
-    // Protected Routes Protection
-    // Users cannot access these paths without being logged in
-    const protectedPaths = ['/feed', '/projects', '/profile', '/explore', '/u', '/ranks', '/institution']
+    // Redirect root to /feed
+    if (request.nextUrl.pathname === '/') {
+        const redirectUrl = request.nextUrl.clone()
+        redirectUrl.pathname = '/feed'
+        return NextResponse.redirect(redirectUrl)
+    }
+
+    // Protected Routes — only these require login
+    const protectedPaths = ['/projects/new', '/profile', '/institution']
     const isProtected = protectedPaths.some(path => request.nextUrl.pathname.startsWith(path))
 
     if (isProtected && !user) {
@@ -56,8 +62,7 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(redirectUrl)
     }
 
-    // Auth Routes check
-    // Logged in users shouldn't see login/signup
+    // Auth Routes check — logged in users shouldn't see login/signup
     const isAuthRoute = request.nextUrl.pathname.startsWith('/auth')
     if (isAuthRoute && user) {
         const redirectUrl = request.nextUrl.clone()

@@ -10,22 +10,22 @@ export default async function ProfilePage() {
         redirect('/auth/login')
     }
 
-    // Default Avatar Logic
     const avatarUrl = profile.avatar_url || `https://api.dicebear.com/9.x/avataaars/svg?seed=${profile.full_name || 'user'}`
 
     return (
         <div className={styles.container}>
             <div className={styles.header}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                     <div>
                         <h1 className={styles.title}>Your Profile</h1>
-                        <p style={{ color: 'var(--text-secondary)' }}>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                             Manage your verified academic identity.
                         </p>
                     </div>
                     <a href={`/u/${profile.id}`} target="_blank" style={{
-                        color: 'var(--accent-primary)', textDecoration: 'none', background: 'rgba(59, 130, 246, 0.1)',
-                        padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.9rem', border: '1px solid rgba(59, 130, 246, 0.3)'
+                        color: 'var(--accent-primary)', textDecoration: 'none', background: 'var(--accent-glow)',
+                        padding: '0.4rem 0.85rem', borderRadius: '99px', fontSize: '0.8rem', fontWeight: 600,
+                        border: '1px solid var(--border-color)', whiteSpace: 'nowrap'
                     }}>
                         View Public Profile ↗
                     </a>
@@ -39,7 +39,7 @@ export default async function ProfilePage() {
                     <div className={styles.avatarSection}>
                         <div className={styles.avatar}>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', background: '#222' }} />
+                            <img src={avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', background: 'var(--bg-secondary)' }} />
                         </div>
                         <div className={styles.userInfo}>
                             <h2 className={styles.name}>{profile.full_name}</h2>

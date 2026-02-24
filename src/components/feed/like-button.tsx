@@ -2,20 +2,28 @@
 
 import { useState, useTransition } from 'react'
 import { toggleLike } from './actions'
+import { useRouter } from 'next/navigation'
 import styles from './feed.module.css'
 
 interface LikeButtonProps {
     projectId: string
     initialLikes: number
     initialHasLiked: boolean
+    isLoggedIn?: boolean
 }
 
-export default function LikeButton({ projectId, initialLikes, initialHasLiked }: LikeButtonProps) {
+export default function LikeButton({ projectId, initialLikes, initialHasLiked, isLoggedIn = true }: LikeButtonProps) {
     const [likes, setLikes] = useState(initialLikes)
     const [hasLiked, setHasLiked] = useState(initialHasLiked)
     const [isPending, startTransition] = useTransition()
+    const router = useRouter()
 
     const handleToggle = async () => {
+        if (!isLoggedIn) {
+            router.push('/auth/login')
+            return
+        }
+
         // Optimistic Update
         const newHasLiked = !hasLiked
         setHasLiked(newHasLiked)
@@ -27,7 +35,6 @@ export default function LikeButton({ projectId, initialLikes, initialHasLiked }:
                 // Revert if error
                 setHasLiked(!newHasLiked)
                 setLikes(prev => !newHasLiked ? prev + 1 : prev - 1)
-                alert('Error: ' + result.error)
             }
         })
     }

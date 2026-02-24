@@ -34,7 +34,7 @@ async function getProjects(type?: string) {
 
     let projects = projectsData || []
 
-    // 2. If user is logged in, fetch their likes to determine 'hasLiked'
+    // If user is logged in, fetch their likes
     if (user) {
         const { data: myLikes } = await supabase
             .from('likes')
@@ -59,29 +59,22 @@ export default async function FeedPage({ searchParams }: { searchParams: { type?
     const { data: { user } } = await supabase.auth.getUser()
     const projects = await getProjects(currentType)
 
+    const tabs = [
+        { id: 'all', label: 'All Posts' },
+        { id: 'project', label: 'Projects' },
+        { id: 'startup', label: 'Startups' },
+        { id: 'event', label: 'Events' }
+    ]
+
     return (
         <div className={`${styles.feedContainer} ${shared.fadeIn}`}>
             {/* Filter Tabs */}
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
-                {[
-                    { id: 'all', label: 'All Posts' },
-                    { id: 'project', label: 'Projects' },
-                    { id: 'startup', label: 'Startups' },
-                    { id: 'event', label: 'Events' }
-                ].map(tab => (
+            <div className={styles.filterTabs}>
+                {tabs.map(tab => (
                     <a
                         key={tab.id}
                         href={`/feed?type=${tab.id}`}
-                        style={{
-                            padding: '0.5rem 1rem',
-                            borderRadius: '20px',
-                            background: currentType === tab.id ? '#fff' : 'rgba(255,255,255,0.05)',
-                            color: currentType === tab.id ? '#000' : '#fff',
-                            textDecoration: 'none',
-                            fontSize: '0.9rem',
-                            whiteSpace: 'nowrap',
-                            border: '1px solid rgba(255,255,255,0.1)'
-                        }}
+                        className={`${styles.filterTab} ${currentType === tab.id ? styles.filterTabActive : ''}`}
                     >
                         {tab.label}
                     </a>
@@ -89,8 +82,9 @@ export default async function FeedPage({ searchParams }: { searchParams: { type?
             </div>
 
             {projects.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
-                    <p>No posts found in this category. Be the first!</p>
+                <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-secondary)' }}>
+                    <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>No posts found</p>
+                    <p style={{ fontSize: '0.85rem' }}>Be the first to share something!</p>
                 </div>
             )}
 

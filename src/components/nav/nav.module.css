@@ -1,3 +1,7 @@
+/* ========================================
+   NAVIGATION — TOP & BOTTOM
+   ======================================== */
+
 .appContainer {
     display: flex;
     flex-direction: column;
@@ -8,7 +12,7 @@
     transition: background 0.3s ease;
 }
 
-/* Top Nav */
+/* ---------- Top Nav ---------- */
 .topNav {
     position: fixed;
     top: 0;
@@ -32,12 +36,13 @@
     font-size: 1.25rem;
     letter-spacing: -0.03em;
     color: var(--text-primary);
-    font-family: var(--font-primary);
+    font-family: var(--font-sans);
 }
 
 .topActions {
     display: flex;
-    gap: 1rem;
+    gap: 0.75rem;
+    align-items: center;
 }
 
 .navIcon {
@@ -51,14 +56,46 @@
     opacity: 1;
 }
 
-/* Bottom Nav */
+/* Auth buttons in top nav */
+.loginBtn {
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.loginBtn:hover {
+    background: var(--accent-glow);
+    opacity: 1;
+}
+
+.signupBtn {
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: var(--accent-primary);
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.signupBtn:hover {
+    filter: brightness(1.1);
+    opacity: 1;
+}
+
+/* ---------- Bottom Nav ---------- */
 .bottomNav {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
     height: calc(56px + env(safe-area-inset-bottom));
-    background: color-mix(in srgb, var(--bg-primary) 90%, transparent);
+    background: color-mix(in srgb, var(--bg-primary) 92%, transparent);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-top: 1px solid var(--border-color);
@@ -80,7 +117,8 @@
     text-decoration: none;
     width: 100%;
     height: 100%;
-    transition: all 0.2s;
+    transition: color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .navItem.active {
@@ -89,7 +127,6 @@
 
 .iconSvg {
     width: 26px;
-    /* Slightly larger for touch targets */
     height: 26px;
     margin-bottom: 2px;
 }
@@ -100,16 +137,21 @@
     letter-spacing: 0.02em;
 }
 
-/* Floating Upload Button Style (Optional - if we center it) */
+/* Upload Button */
 .uploadButton {
     width: 40px;
     height: 40px;
     background: var(--accent-primary);
     border-radius: 12px;
-    /* Squircle */
     display: flex;
     align-items: center;
     justify-content: center;
     color: #fff;
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px var(--accent-glow);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.uploadButton:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px var(--accent-glow);
 }

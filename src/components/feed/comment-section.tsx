@@ -63,9 +63,9 @@ export default function CommentSection({ projectId, currentUserId }: { projectId
             <button
                 onClick={() => setIsOpen(true)}
                 style={{
-                    background: 'none', border: 'none', color: '#888',
+                    background: 'none', border: 'none', color: 'var(--text-muted)',
                     cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem',
-                    padding: '0.5rem 0', fontSize: '0.85rem'
+                    padding: '0.5rem 0', fontSize: '0.85rem', transition: 'color 0.2s'
                 }}
             >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -78,14 +78,14 @@ export default function CommentSection({ projectId, currentUserId }: { projectId
 
     return (
         <div style={{
-            borderTop: '1px solid rgba(255,255,255,0.08)',
+            borderTop: '1px solid var(--border-color)',
             marginTop: '0.5rem',
             paddingTop: '0.75rem'
         }}>
             {/* Comments List */}
             <div style={{ maxHeight: '300px', overflowY: 'auto', marginBottom: '0.75rem' }}>
                 {comments.length === 0 ? (
-                    <p style={{ color: '#555', fontSize: '0.85rem', textAlign: 'center', padding: '1rem 0' }}>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '1rem 0' }}>
                         No comments yet. Be the first!
                     </p>
                 ) : (
@@ -100,33 +100,34 @@ export default function CommentSection({ projectId, currentUserId }: { projectId
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img src={avatar} alt="" style={{
                                         width: '28px', height: '28px', borderRadius: '50%',
-                                        objectFit: 'cover', background: '#222', flexShrink: 0
+                                        objectFit: 'cover', background: 'var(--input-bg)', flexShrink: 0
                                     }} />
                                 </Link>
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <Link href={`/u/${comment.user_id}`} style={{
-                                            fontWeight: 600, fontSize: '0.85rem', color: '#fff',
+                                            fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)',
                                             textDecoration: 'none'
                                         }}>
                                             {comment.profiles?.full_name || 'User'}
                                         </Link>
-                                        <span style={{ color: '#555', fontSize: '0.75rem' }}>
+                                        <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
                                             {timeAgo(comment.created_at)}
                                         </span>
                                         {currentUserId === comment.user_id && (
                                             <button
                                                 onClick={() => handleDelete(comment.id)}
                                                 style={{
-                                                    background: 'none', border: 'none', color: '#666',
-                                                    cursor: 'pointer', fontSize: '0.75rem', marginLeft: 'auto'
+                                                    background: 'none', border: 'none', color: 'var(--text-muted)',
+                                                    cursor: 'pointer', fontSize: '0.75rem', marginLeft: 'auto',
+                                                    borderRadius: '4px', padding: '2px 6px', transition: 'color 0.2s'
                                                 }}
                                             >
                                                 ✕
                                             </button>
                                         )}
                                     </div>
-                                    <p style={{ color: '#ccc', fontSize: '0.85rem', margin: '0.2rem 0 0', wordBreak: 'break-word' }}>
+                                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: '0.2rem 0 0', wordBreak: 'break-word', lineHeight: 1.4 }}>
                                         {comment.content}
                                     </p>
                                 </div>
@@ -146,35 +147,37 @@ export default function CommentSection({ projectId, currentUserId }: { projectId
                         onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
                         placeholder="Add a comment..."
                         style={{
-                            flex: 1, background: 'rgba(255,255,255,0.05)',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            borderRadius: '20px', padding: '0.5rem 1rem',
-                            color: '#fff', fontSize: '0.85rem', outline: 'none'
+                            flex: 1, background: 'var(--input-bg)',
+                            border: '1px solid var(--border-color)',
+                            borderRadius: '99px', padding: '0.5rem 1rem',
+                            color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none',
+                            fontFamily: 'var(--font-sans)'
                         }}
                     />
                     <button
                         onClick={handleSubmit}
                         disabled={loading || !newComment.trim()}
                         style={{
-                            background: '#0095f6', color: '#fff', border: 'none',
-                            borderRadius: '20px', padding: '0.5rem 1rem',
+                            background: 'var(--accent-primary)', color: '#fff', border: 'none',
+                            borderRadius: '99px', padding: '0.5rem 1rem',
                             cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600,
-                            opacity: loading || !newComment.trim() ? 0.5 : 1
+                            opacity: loading || !newComment.trim() ? 0.5 : 1,
+                            transition: 'opacity 0.2s'
                         }}
                     >
                         {loading ? '...' : 'Post'}
                     </button>
                 </div>
             ) : (
-                <p style={{ color: '#555', fontSize: '0.8rem', textAlign: 'center' }}>
-                    <Link href="/auth/login" style={{ color: '#0095f6' }}>Log in</Link> to comment
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textAlign: 'center' }}>
+                    <Link href="/auth/login" style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>Log in</Link> to comment
                 </p>
             )}
 
             <button
                 onClick={() => setIsOpen(false)}
                 style={{
-                    background: 'none', border: 'none', color: '#555',
+                    background: 'none', border: 'none', color: 'var(--text-muted)',
                     cursor: 'pointer', fontSize: '0.75rem', marginTop: '0.5rem',
                     width: '100%', textAlign: 'center'
                 }}

@@ -25,8 +25,8 @@ export default function ProfileForm({ profile }: { profile: any }) {
     return (
         <>
             <form action={formAction}>
-                {state.error && <div style={{ color: 'red', marginBottom: '1rem' }}>{state.error}</div>}
-                {state.success && <div style={{ color: 'green', marginBottom: '1rem' }}>{state.success}</div>}
+                {state.error && <div style={{ color: '#ef4444', marginBottom: '0.75rem', fontSize: '0.85rem', padding: '0.5rem 0.75rem', background: 'rgba(239,68,68,0.1)', borderRadius: '8px' }}>{state.error}</div>}
+                {state.success && <div style={{ color: '#22c55e', marginBottom: '0.75rem', fontSize: '0.85rem', padding: '0.5rem 0.75rem', background: 'rgba(34,197,94,0.1)', borderRadius: '8px' }}>{state.success}</div>}
 
                 <div className={styles.formGrid}>
                     <div className={styles.group}>
@@ -35,6 +35,7 @@ export default function ProfileForm({ profile }: { profile: any }) {
                             name="full_name"
                             defaultValue={profile.full_name || ''}
                             className={styles.input}
+                            placeholder="Your full name"
                             required
                         />
                     </div>
@@ -89,40 +90,41 @@ export default function ProfileForm({ profile }: { profile: any }) {
 
             {/* CV Section */}
             <div style={{
-                marginTop: '2rem', paddingTop: '2rem',
-                borderTop: '1px solid rgba(255,255,255,0.1)'
+                marginTop: '1.5rem', paddingTop: '1.5rem',
+                borderTop: '1px solid var(--border-color)'
             }}>
-                <h3 style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '1.1rem' }}>📄 Resume / CV</h3>
+                <h3 style={{ marginBottom: '0.75rem', fontWeight: 600, fontSize: '1rem', color: 'var(--text-primary)' }}>📄 Resume / CV</h3>
 
                 {profile.cv_url && (
                     <div style={{
-                        marginBottom: '1rem', padding: '0.75rem 1rem',
-                        background: 'rgba(0, 149, 246, 0.1)',
-                        border: '1px solid rgba(0, 149, 246, 0.2)',
+                        marginBottom: '0.75rem', padding: '0.65rem 0.85rem',
+                        background: 'var(--accent-glow)',
+                        border: '1px solid var(--border-color)',
                         borderRadius: '8px', display: 'flex',
-                        justifyContent: 'space-between', alignItems: 'center'
+                        justifyContent: 'space-between', alignItems: 'center',
+                        flexWrap: 'wrap', gap: '0.5rem'
                     }}>
-                        <span style={{ color: '#0095f6', fontSize: '0.9rem' }}>✅ CV Uploaded</span>
+                        <span style={{ color: '#22c55e', fontSize: '0.85rem' }}>✅ CV Uploaded</span>
                         <a href={profile.cv_url} target="_blank" rel="noopener noreferrer"
-                            style={{ color: '#0095f6', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem' }}>
+                            style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 600, fontSize: '0.85rem' }}>
                             View CV ↗
                         </a>
                     </div>
                 )}
 
-                <form onSubmit={handleCvUpload} style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                <form onSubmit={handleCvUpload} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                     <input
                         type="file"
                         name="cv"
                         accept=".pdf,.doc,.docx"
-                        style={{ color: '#ccc', fontSize: '0.9rem' }}
+                        style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', flex: 1, minWidth: '150px' }}
                         required
                     />
                     <button
                         type="submit"
                         className={styles.button}
                         disabled={cvUploading}
-                        style={{ marginTop: 0, padding: '0.5rem 1.25rem' }}
+                        style={{ marginTop: 0, padding: '0.45rem 1rem', fontSize: '0.85rem' }}
                     >
                         {cvUploading ? 'Uploading...' : 'Upload CV'}
                     </button>
@@ -130,13 +132,13 @@ export default function ProfileForm({ profile }: { profile: any }) {
 
                 {cvMessage && (
                     <p style={{
-                        marginTop: '0.5rem', fontSize: '0.85rem',
-                        color: cvMessage.includes('success') ? 'green' : 'red'
+                        marginTop: '0.4rem', fontSize: '0.8rem',
+                        color: cvMessage.includes('success') ? '#22c55e' : '#ef4444'
                     }}>
                         {cvMessage}
                     </p>
                 )}
-                <p style={{ color: '#666', fontSize: '0.8rem', marginTop: '0.5rem' }}>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '0.4rem' }}>
                     Max 5MB · PDF, DOC, DOCX
                 </p>
             </div>

@@ -19,12 +19,10 @@ export default function ExplorePage() {
     const [uniStats, setUniStats] = useState<{ name: string; count: number }[]>([])
     const [loading, setLoading] = useState(false)
 
-    // Load university stats on mount
     useEffect(() => {
         getUniversityStats().then(setUniStats)
     }, [])
 
-    // Debounced search
     useEffect(() => {
         const delayDebounceFn = setTimeout(async () => {
             setLoading(true)
@@ -50,10 +48,10 @@ export default function ExplorePage() {
     return (
         <div style={{ maxWidth: '800px', margin: '0 auto' }} className={shared.fadeIn}>
             <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
-                <h1 className={shared.textGradient} style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '0.5rem' }}>
+                <h1 className={shared.textGradient} style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '0.5rem' }}>
                     Explore
                 </h1>
-                <p style={{ color: 'var(--text-secondary)' }}>Discover people, universities & projects.</p>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Discover people, universities & projects.</p>
             </div>
 
             {/* Tabs */}
@@ -66,14 +64,16 @@ export default function ExplorePage() {
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         style={{
-                            padding: '0.6rem 1.2rem',
-                            borderRadius: '20px',
-                            border: activeTab === tab.id ? '1px solid #0095f6' : '1px solid rgba(255,255,255,0.1)',
-                            background: activeTab === tab.id ? 'rgba(0, 149, 246, 0.15)' : 'rgba(255,255,255,0.03)',
-                            color: activeTab === tab.id ? '#0095f6' : '#fff',
+                            padding: '0.5rem 1.2rem',
+                            borderRadius: '99px',
+                            border: activeTab === tab.id ? '1px solid var(--accent-primary)' : '1px solid var(--border-color)',
+                            background: activeTab === tab.id ? 'var(--accent-glow)' : 'transparent',
+                            color: activeTab === tab.id ? 'var(--accent-primary)' : 'var(--text-secondary)',
                             cursor: 'pointer',
-                            fontSize: '0.9rem',
+                            fontSize: '0.85rem',
                             fontWeight: activeTab === tab.id ? 600 : 400,
+                            transition: 'all 0.2s',
+                            fontFamily: 'var(--font-sans)'
                         }}
                     >
                         {tab.icon} {tab.label}
@@ -81,7 +81,7 @@ export default function ExplorePage() {
                 ))}
             </div>
 
-            {/* Search Bar (for People and Posts) */}
+            {/* Search */}
             {activeTab !== 'universities' && (
                 <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '0.75rem', flexDirection: 'column' }}>
                     <div style={{ position: 'relative', flex: 1 }}>
@@ -89,11 +89,11 @@ export default function ExplorePage() {
                             type="text"
                             placeholder={activeTab === 'people' ? 'Search by name...' : 'Search projects...'}
                             className={shared.input}
-                            style={{ paddingLeft: '3rem', fontSize: '1rem' }}
+                            style={{ paddingLeft: '2.75rem' }}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }}>🔍</span>
+                        <span style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }}>🔍</span>
                     </div>
 
                     <select
@@ -112,14 +112,14 @@ export default function ExplorePage() {
 
             {/* Content */}
             {loading ? (
-                <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>Loading...</div>
+                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Loading...</div>
             ) : (
                 <>
                     {/* People Tab */}
                     {activeTab === 'people' && (
                         <div>
                             {people.length === 0 ? (
-                                <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
                                     {searchTerm || selectedUni ? 'No people found.' : 'Start typing to search for people.'}
                                 </div>
                             ) : (
@@ -133,24 +133,23 @@ export default function ExplorePage() {
                                                 style={{ textDecoration: 'none', color: 'inherit' }}
                                             >
                                                 <div className={shared.glassCard} style={{
-                                                    display: 'flex', alignItems: 'center', gap: '1rem',
+                                                    display: 'flex', alignItems: 'center', gap: '0.75rem',
                                                     padding: '0.75rem 1rem', cursor: 'pointer',
-                                                    transition: 'background 0.2s',
                                                 }}>
                                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                                     <img src={avatar} alt="" style={{
-                                                        width: '48px', height: '48px', borderRadius: '50%',
-                                                        objectFit: 'cover', background: '#222'
+                                                        width: '44px', height: '44px', borderRadius: '50%',
+                                                        objectFit: 'cover', background: 'var(--input-bg)', flexShrink: 0
                                                     }} />
                                                     <div style={{ flex: 1, minWidth: 0 }}>
-                                                        <div style={{ fontWeight: 600, fontSize: '1rem', color: '#fff' }}>
+                                                        <div style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
                                                             {person.full_name || 'Anonymous'}
                                                         </div>
-                                                        <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '2px' }}>
+                                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
                                                             {person.university || 'No university'} · {person.role}
                                                         </div>
                                                     </div>
-                                                    <span style={{ color: '#555', fontSize: '1.2rem' }}>→</span>
+                                                    <span style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>→</span>
                                                 </div>
                                             </Link>
                                         )
@@ -164,15 +163,15 @@ export default function ExplorePage() {
                     {activeTab === 'universities' && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                             {uniStats.length === 0 ? (
-                                <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>No universities found.</div>
+                                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>No universities found.</div>
                             ) : (
                                 uniStats.map(uni => (
                                     <div
                                         key={uni.name}
                                         className={shared.glassCard}
                                         style={{
-                                            display: 'flex', alignItems: 'center', gap: '1rem',
-                                            padding: '1rem 1.25rem', cursor: 'pointer',
+                                            display: 'flex', alignItems: 'center', gap: '0.75rem',
+                                            padding: '0.85rem 1rem', cursor: 'pointer',
                                         }}
                                         onClick={() => {
                                             setActiveTab('people')
@@ -180,22 +179,22 @@ export default function ExplorePage() {
                                         }}
                                     >
                                         <div style={{
-                                            width: '44px', height: '44px', borderRadius: '12px',
-                                            background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                                            width: '40px', height: '40px', borderRadius: '12px',
+                                            background: 'linear-gradient(135deg, var(--accent-primary), #8b5cf6)',
                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            fontSize: '1.3rem', flexShrink: 0
+                                            fontSize: '1.2rem', flexShrink: 0
                                         }}>
                                             🏫
                                         </div>
                                         <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{ fontWeight: 600, color: '#fff', fontSize: '0.95rem' }}>
+                                            <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.9rem' }}>
                                                 {uni.name}
                                             </div>
-                                            <div style={{ color: '#888', fontSize: '0.85rem', marginTop: '2px' }}>
+                                            <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '2px' }}>
                                                 {uni.count} {uni.count === 1 ? 'member' : 'members'}
                                             </div>
                                         </div>
-                                        <span style={{ color: '#555', fontSize: '1.2rem' }}>→</span>
+                                        <span style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>→</span>
                                     </div>
                                 ))
                             )}
@@ -206,7 +205,7 @@ export default function ExplorePage() {
                     {activeTab === 'posts' && (
                         <div>
                             {projects.length === 0 ? (
-                                <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
                                     {searchTerm || selectedUni ? 'No posts found.' : 'Start typing to search posts.'}
                                 </div>
                             ) : (
