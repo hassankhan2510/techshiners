@@ -85,11 +85,11 @@ function SignupForm() {
                     <div className={styles.roleToggle}>
                         <label className={styles.roleOption}>
                             <input type="radio" name="role" value="student" defaultChecked className={styles.roleRadio} />
-                            <span className={styles.roleLabel}>🎓 Student</span>
+                            <span className={styles.roleLabel}>Student</span>
                         </label>
                         <label className={styles.roleOption}>
                             <input type="radio" name="role" value="company" className={styles.roleRadio} />
-                            <span className={styles.roleLabel}>🏢 Company</span>
+                            <span className={styles.roleLabel}>Company</span>
                         </label>
                     </div>
                 </div>
@@ -116,7 +116,7 @@ export default function SignupPage() {
 
             <div className={styles.card}>
                 <div className={styles.logoWrap}>
-                    <div className={styles.logoIcon}>🚀</div>
+                    <div className={styles.logoIcon}>TS</div>
                     <h1 className={styles.title}>Join TechShin<span className={styles.titleAccent}>ers</span></h1>
                 </div>
                 <p className={styles.subtitle}>Create your account and showcase your tech projects.</p>

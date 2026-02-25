@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import styles from '@/components/feed/feed.module.css'
 import shared from '@/components/ui/shared.module.css'
 import ProjectCard from '@/components/feed/project-card'
+import { MODERATOR_EMAIL } from '@/lib/constants'
 
 async function getProjects(type?: string) {
     const supabase = await createClient()
@@ -34,7 +35,6 @@ async function getProjects(type?: string) {
 
     let projects = projectsData || []
 
-    // If user is logged in, fetch their likes
     if (user) {
         const { data: myLikes } = await supabase
             .from('likes')
@@ -52,11 +52,19 @@ async function getProjects(type?: string) {
     return projects
 }
 
-export default async function FeedPage({ searchParams }: { searchParams: { type?: string } }) {
-    const { type } = searchParams || {}
-    const currentType = type || 'all'
+export default async function FeedPage({ searchParams }: { searchParams: Promise<{ type?: string }> }) {
+    const params = await searchParams
+    const currentType = params?.type || 'all'
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
+
+    // Check moderator status
+    let isMod = false
+    if (user) {
+        const { data: profile } = await supabase.from('profiles').select('email').eq('id', user.id).single()
+        isMod = profile?.email === MODERATOR_EMAIL
+    }
+
     const projects = await getProjects(currentType)
 
     const tabs = [
@@ -68,14 +76,10 @@ export default async function FeedPage({ searchParams }: { searchParams: { type?
 
     return (
         <div className={`${styles.feedContainer} ${shared.fadeIn}`}>
-            {/* Filter Tabs */}
             <div className={styles.filterTabs}>
                 {tabs.map(tab => (
-                    <a
-                        key={tab.id}
-                        href={`/feed?type=${tab.id}`}
-                        className={`${styles.filterTab} ${currentType === tab.id ? styles.filterTabActive : ''}`}
-                    >
+                    <a key={tab.id} href={`/feed?type=${tab.id}`}
+                        className={`${styles.filterTab} ${currentType === tab.id ? styles.filterTabActive : ''}`}>
                         {tab.label}
                     </a>
                 ))}
@@ -89,7 +93,7 @@ export default async function FeedPage({ searchParams }: { searchParams: { type?
             )}
 
             {projects.map((project: any) => (
-                <ProjectCard key={project.id} project={project} currentUserId={user?.id} />
+                <ProjectCard key={project.id} project={project} currentUserId={user?.id} isModerator={isMod} />
             ))}
         </div>
     )

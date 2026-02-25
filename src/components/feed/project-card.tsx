@@ -7,13 +7,15 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { deleteProject, contributeToProject } from '@/app/(app)/profile/actions'
+import { moderatorDeleteProject } from '@/lib/moderator-actions'
 
 interface ProjectCardProps {
     project: any
     currentUserId?: string
+    isModerator?: boolean
 }
 
-export default function ProjectCard({ project, currentUserId }: ProjectCardProps) {
+export default function ProjectCard({ project, currentUserId, isModerator }: ProjectCardProps) {
     const authorName = project.profiles?.full_name || 'Unknown User'
     const authorAvatar = project.profiles?.avatar_url || `https://api.dicebear.com/9.x/avataaars/svg?seed=${authorName}`
     const [menuOpen, setMenuOpen] = useState(false)
@@ -25,11 +27,17 @@ export default function ProjectCard({ project, currentUserId }: ProjectCardProps
 
     const isOwner = currentUserId === project.user_id
     const isLoggedIn = !!currentUserId
+    const canDelete = isOwner || isModerator
 
     const handleDelete = async () => {
         if (!confirm('Delete this post permanently?')) return
-        const result = await deleteProject(project.id)
-        if (result.success) setDeleted(true)
+        let result
+        if (isOwner) {
+            result = await deleteProject(project.id)
+        } else if (isModerator) {
+            result = await moderatorDeleteProject(project.id)
+        }
+        if (result?.success) setDeleted(true)
         setMenuOpen(false)
     }
 
@@ -43,6 +51,9 @@ export default function ProjectCard({ project, currentUserId }: ProjectCardProps
     }
 
     if (deleted) return null
+
+    // Tech stack tags (from project or skills)
+    const techStack = project.tech_stack || project.skills || []
 
     return (
         <div className={styles.projectCard}>
@@ -67,7 +78,7 @@ export default function ProjectCard({ project, currentUserId }: ProjectCardProps
                 </div>
 
                 {/* More Menu */}
-                {isOwner && (
+                {canDelete && (
                     <div style={{ position: 'relative' }}>
                         <button className={styles.moreBtn} onClick={() => setMenuOpen(!menuOpen)}>
                             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle><circle cx="5" cy="12" r="2"></circle></svg>
@@ -75,7 +86,7 @@ export default function ProjectCard({ project, currentUserId }: ProjectCardProps
                         {menuOpen && (
                             <div className={styles.dropdownMenu}>
                                 <button onClick={handleDelete} className={styles.dropdownItem} style={{ color: '#ef4444' }}>
-                                    🗑️ Delete Post
+                                    {isModerator && !isOwner ? 'Mod Delete' : 'Delete Post'}
                                 </button>
                                 <button onClick={() => setMenuOpen(false)} className={styles.dropdownItem}>
                                     ✕ Close
@@ -91,15 +102,9 @@ export default function ProjectCard({ project, currentUserId }: ProjectCardProps
                 {project.image_url ? (
                     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                            src={project.image_url}
-                            alt={project.title}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
+                        <img src={project.image_url} alt={project.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         {project.type && project.type !== 'project' && (
-                            <span className={styles.typeBadge}>
-                                {project.type}
-                            </span>
+                            <span className={styles.typeBadge}>{project.type}</span>
                         )}
                     </div>
                 ) : (
@@ -118,18 +123,29 @@ export default function ProjectCard({ project, currentUserId }: ProjectCardProps
             <div className={styles.cardContent}>
                 <h3 className={styles.projectTitle}>{project.title}</h3>
                 <DescriptionWithSeeMore text={project.description} />
-                {project.project_url && (
-                    <a
-                        href={project.project_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.projectLink}
-                    >
-                        🔗 {project.project_url.replace(/^https?:\/\//, '').slice(0, 40)}{project.project_url.length > 40 ? '...' : ''}
-                    </a>
-                )}
+
+                {/* Project Links */}
+                <div className={styles.projectLinks}>
+                    {project.github_url && (
+                        <a href={project.github_url} target="_blank" rel="noopener noreferrer" className={styles.projectLink}>
+                            GitHub
+                        </a>
+                    )}
+                    {project.demo_url && (
+                        <a href={project.demo_url} target="_blank" rel="noopener noreferrer" className={styles.projectLink}>
+                            Live Demo
+                        </a>
+                    )}
+                    {project.project_url && !project.github_url && !project.demo_url && (
+                        <a href={project.project_url} target="_blank" rel="noopener noreferrer" className={styles.projectLink}>
+                            {project.project_url.replace(/^https?:\/\//, '').slice(0, 40)}{project.project_url.length > 40 ? '...' : ''}
+                        </a>
+                    )}
+                </div>
+
+                {/* Tags */}
                 <div className={styles.tags}>
-                    {project.skills && project.skills.map((tag: string) => (
+                    {techStack.map((tag: string) => (
                         <span key={tag} className={styles.tag}>#{tag}</span>
                     ))}
                 </div>
@@ -143,41 +159,29 @@ export default function ProjectCard({ project, currentUserId }: ProjectCardProps
                     initialHasLiked={!!project.is_liked}
                     isLoggedIn={isLoggedIn}
                 />
-                {/* Contribute Button */}
                 {!isOwner && !contribSent && (
-                    <button
-                        onClick={() => {
-                            if (!isLoggedIn) { router.push('/auth/login'); return }
-                            setContribOpen(!contribOpen)
-                        }}
-                        className={styles.actionBtn}
-                        style={{ color: contribOpen ? 'var(--accent-primary)' : undefined }}
-                    >
-                        🤝 Contribute
+                    <button onClick={() => {
+                        if (!isLoggedIn) { router.push('/auth/login'); return }
+                        setContribOpen(!contribOpen)
+                    }} className={styles.actionBtn} style={{ color: contribOpen ? 'var(--accent-primary)' : undefined }}>
+                        Contribute
                     </button>
                 )}
-                {contribSent && (
-                    <span className={styles.sentBadge}>✅ Sent</span>
-                )}
+                {contribSent && <span className={styles.sentBadge}>Sent</span>}
             </div>
 
             {/* Contribute Form */}
             {contribOpen && (
                 <div className={styles.contribForm}>
-                    <input
-                        type="text"
-                        value={contribMsg}
-                        onChange={(e) => setContribMsg(e.target.value)}
-                        placeholder="How would you like to help?"
-                        className={styles.contribInput}
-                    />
+                    <input type="text" value={contribMsg} onChange={(e) => setContribMsg(e.target.value)}
+                        placeholder="How would you like to help?" className={styles.contribInput} />
                     <button onClick={handleContribute} className={styles.contribSubmit}>Send</button>
                 </div>
             )}
 
             {/* Comments */}
             <div style={{ padding: '0 1rem 0.75rem' }}>
-                <CommentSection projectId={project.id} currentUserId={currentUserId} />
+                <CommentSection projectId={project.id} currentUserId={currentUserId} isModerator={isModerator} />
             </div>
         </div>
     )

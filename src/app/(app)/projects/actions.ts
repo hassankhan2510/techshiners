@@ -11,35 +11,31 @@ export type ProjectState = {
 
 export async function createProject(prevState: ProjectState, formData: FormData): Promise<ProjectState> {
     const supabase = await createClient()
-
     const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) {
-        redirect('/auth/login')
-    }
+    if (!user) redirect('/auth/login')
 
     const title = formData.get('title') as string
     const description = formData.get('description') as string
     const skillsStr = formData.get('skills') as string
     const project_url = formData.get('project_url') as string
+    const github_url = formData.get('github_url') as string
+    const demo_url = formData.get('demo_url') as string
     const type = formData.get('type') as string || 'project'
     const imageFile = formData.get('image') as File
+    const techStackStr = formData.get('tech_stack') as string
 
-    // Parse comma-separated skills
     const skills = skillsStr ? skillsStr.split(',').map(s => s.trim()).filter(s => s.length > 0) : []
+    const tech_stack = techStackStr ? techStackStr.split(',').map(s => s.trim()).filter(s => s.length > 0) : []
 
     let image_url = null
 
     if (imageFile && imageFile.size > 0) {
-        // Simple file validation (size/type could be checked here)
         const filename = `${Date.now()}-${imageFile.name.replace(/[^a-zA-Z0-9.]/g, '')}`
-        const { data: uploadData, error: uploadError } = await supabase
+        const { error: uploadError } = await supabase
             .storage
             .from('posts')
-            .upload(filename, imageFile, {
-                cacheControl: '3600',
-                upsert: false
-            })
+            .upload(filename, imageFile, { cacheControl: '3600', upsert: false })
 
         if (uploadError) {
             console.error('Upload Error:', uploadError)
@@ -57,7 +53,10 @@ export async function createProject(prevState: ProjectState, formData: FormData)
             title,
             description,
             skills,
-            project_url,
+            project_url: project_url || null,
+            github_url: github_url || null,
+            demo_url: demo_url || null,
+            tech_stack,
             type,
             image_url,
             status: 'published',

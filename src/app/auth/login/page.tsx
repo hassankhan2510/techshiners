@@ -82,7 +82,7 @@ export default function LoginPage() {
 
             <div className={styles.card}>
                 <div className={styles.logoWrap}>
-                    <div className={styles.logoIcon}>⚡</div>
+                    <div className={styles.logoIcon}>TS</div>
                     <h1 className={styles.title}>TechShin<span className={styles.titleAccent}>ers</span></h1>
                 </div>
                 <p className={styles.subtitle}>Welcome back! Log in to continue.</p>

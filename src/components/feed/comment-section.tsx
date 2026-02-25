@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { addComment, deleteComment, getComments } from './comment-actions'
+import { moderatorDeleteComment } from '@/lib/moderator-actions'
 import Link from 'next/link'
 
 interface Comment {
@@ -15,16 +16,14 @@ interface Comment {
     }
 }
 
-export default function CommentSection({ projectId, currentUserId }: { projectId: string, currentUserId?: string }) {
+export default function CommentSection({ projectId, currentUserId, isModerator }: { projectId: string, currentUserId?: string, isModerator?: boolean }) {
     const [comments, setComments] = useState<Comment[]>([])
     const [newComment, setNewComment] = useState('')
     const [loading, setLoading] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
-        if (isOpen) {
-            loadComments()
-        }
+        if (isOpen) loadComments()
     }, [isOpen])
 
     const loadComments = async () => {
@@ -43,10 +42,13 @@ export default function CommentSection({ projectId, currentUserId }: { projectId
         setLoading(false)
     }
 
-    const handleDelete = async (commentId: string) => {
-        const result = await deleteComment(commentId)
-        if (result.success) {
-            setComments(prev => prev.filter(c => c.id !== commentId))
+    const handleDelete = async (commentId: string, isOwn: boolean) => {
+        if (isOwn) {
+            const result = await deleteComment(commentId)
+            if (result.success) setComments(prev => prev.filter(c => c.id !== commentId))
+        } else if (isModerator) {
+            const result = await moderatorDeleteComment(commentId)
+            if (result.success) setComments(prev => prev.filter(c => c.id !== commentId))
         }
     }
 
@@ -60,14 +62,11 @@ export default function CommentSection({ projectId, currentUserId }: { projectId
 
     if (!isOpen) {
         return (
-            <button
-                onClick={() => setIsOpen(true)}
-                style={{
-                    background: 'none', border: 'none', color: 'var(--text-muted)',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem',
-                    padding: '0.5rem 0', fontSize: '0.85rem', transition: 'color 0.2s'
-                }}
-            >
+            <button onClick={() => setIsOpen(true)} style={{
+                background: 'none', border: 'none', color: 'var(--text-muted)',
+                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem',
+                padding: '0.5rem 0', fontSize: '0.85rem', transition: 'color 0.2s'
+            }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
                 </svg>
@@ -77,12 +76,7 @@ export default function CommentSection({ projectId, currentUserId }: { projectId
     }
 
     return (
-        <div style={{
-            borderTop: '1px solid var(--border-color)',
-            marginTop: '0.5rem',
-            paddingTop: '0.75rem'
-        }}>
-            {/* Comments List */}
+        <div style={{ borderTop: '1px solid var(--border-color)', marginTop: '0.5rem', paddingTop: '0.75rem' }}>
             <div style={{ maxHeight: '300px', overflowY: 'auto', marginBottom: '0.75rem' }}>
                 {comments.length === 0 ? (
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '1rem 0' }}>
@@ -91,10 +85,11 @@ export default function CommentSection({ projectId, currentUserId }: { projectId
                 ) : (
                     comments.map(comment => {
                         const avatar = comment.profiles?.avatar_url || `https://api.dicebear.com/9.x/avataaars/svg?seed=${comment.profiles?.full_name || 'user'}`
+                        const isOwn = currentUserId === comment.user_id
+                        const canDel = isOwn || isModerator
                         return (
                             <div key={comment.id} style={{
-                                display: 'flex', gap: '0.6rem', marginBottom: '0.75rem',
-                                padding: '0.5rem', borderRadius: '8px',
+                                display: 'flex', gap: '0.6rem', marginBottom: '0.75rem', padding: '0.5rem', borderRadius: '8px',
                             }}>
                                 <Link href={`/u/${comment.user_id}`}>
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -106,24 +101,20 @@ export default function CommentSection({ projectId, currentUserId }: { projectId
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <Link href={`/u/${comment.user_id}`} style={{
-                                            fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)',
-                                            textDecoration: 'none'
+                                            fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)', textDecoration: 'none'
                                         }}>
                                             {comment.profiles?.full_name || 'User'}
                                         </Link>
                                         <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
                                             {timeAgo(comment.created_at)}
                                         </span>
-                                        {currentUserId === comment.user_id && (
-                                            <button
-                                                onClick={() => handleDelete(comment.id)}
-                                                style={{
-                                                    background: 'none', border: 'none', color: 'var(--text-muted)',
-                                                    cursor: 'pointer', fontSize: '0.75rem', marginLeft: 'auto',
-                                                    borderRadius: '4px', padding: '2px 6px', transition: 'color 0.2s'
-                                                }}
-                                            >
-                                                ✕
+                                        {canDel && (
+                                            <button onClick={() => handleDelete(comment.id, isOwn)} style={{
+                                                background: 'none', border: 'none', color: isOwn ? 'var(--text-muted)' : '#ef4444',
+                                                cursor: 'pointer', fontSize: '0.75rem', marginLeft: 'auto',
+                                                borderRadius: '4px', padding: '2px 6px', transition: 'color 0.2s'
+                                            }}>
+                                                {isOwn ? '✕' : '🛡️'}
                                             </button>
                                         )}
                                     </div>
@@ -137,34 +128,21 @@ export default function CommentSection({ projectId, currentUserId }: { projectId
                 )}
             </div>
 
-            {/* Comment Input */}
             {currentUserId ? (
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                    <input
-                        type="text"
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
+                    <input type="text" value={newComment} onChange={(e) => setNewComment(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                        placeholder="Add a comment..."
-                        style={{
-                            flex: 1, background: 'var(--input-bg)',
-                            border: '1px solid var(--border-color)',
-                            borderRadius: '99px', padding: '0.5rem 1rem',
-                            color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none',
-                            fontFamily: 'var(--font-sans)'
-                        }}
-                    />
-                    <button
-                        onClick={handleSubmit}
-                        disabled={loading || !newComment.trim()}
-                        style={{
-                            background: 'var(--accent-primary)', color: '#fff', border: 'none',
-                            borderRadius: '99px', padding: '0.5rem 1rem',
-                            cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600,
-                            opacity: loading || !newComment.trim() ? 0.5 : 1,
-                            transition: 'opacity 0.2s'
-                        }}
-                    >
+                        placeholder="Add a comment..." style={{
+                            flex: 1, background: 'var(--input-bg)', border: '1px solid var(--border-color)',
+                            borderRadius: '99px', padding: '0.5rem 1rem', color: 'var(--text-primary)',
+                            fontSize: '0.85rem', outline: 'none', fontFamily: 'var(--font-sans)'
+                        }} />
+                    <button onClick={handleSubmit} disabled={loading || !newComment.trim()} style={{
+                        background: 'var(--accent-primary)', color: '#fff', border: 'none',
+                        borderRadius: '99px', padding: '0.5rem 1rem', cursor: 'pointer',
+                        fontSize: '0.85rem', fontWeight: 600,
+                        opacity: loading || !newComment.trim() ? 0.5 : 1, transition: 'opacity 0.2s'
+                    }}>
                         {loading ? '...' : 'Post'}
                     </button>
                 </div>
@@ -174,14 +152,10 @@ export default function CommentSection({ projectId, currentUserId }: { projectId
                 </p>
             )}
 
-            <button
-                onClick={() => setIsOpen(false)}
-                style={{
-                    background: 'none', border: 'none', color: 'var(--text-muted)',
-                    cursor: 'pointer', fontSize: '0.75rem', marginTop: '0.5rem',
-                    width: '100%', textAlign: 'center'
-                }}
-            >
+            <button onClick={() => setIsOpen(false)} style={{
+                background: 'none', border: 'none', color: 'var(--text-muted)',
+                cursor: 'pointer', fontSize: '0.75rem', marginTop: '0.5rem', width: '100%', textAlign: 'center'
+            }}>
                 Hide Comments
             </button>
         </div>
