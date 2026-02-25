@@ -61,21 +61,21 @@
 
 /* Premium Buttons */
 .button {
-    background: var(--text-primary);
-    color: var(--bg-primary);
+    background: var(--gradient-accent);
+    color: #fff;
     border: none;
     padding: 0.75rem 1.75rem;
     border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s;
     font-size: 0.9rem;
     font-family: var(--font-sans);
 }
 
 .button:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px var(--accent-glow);
 }
 
 .buttonSecondary {

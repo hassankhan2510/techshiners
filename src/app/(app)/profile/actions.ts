@@ -24,6 +24,7 @@ const ISLAMABAD_UNIVERSITIES = [
     "National Defence University (NDU)",
     "PIEAS (Pakistan Institute of Engineering and Applied Sciences)",
     "IST (Institute of Space Technology)",
+    "National University of Technology (NUTECH)",
     "Other"
 ]
 
@@ -157,6 +158,56 @@ export async function uploadCV(formData: FormData) {
 
     revalidatePath('/profile')
     return { success: 'CV uploaded successfully!' }
+}
+
+export async function uploadAvatar(formData: FormData) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) return { error: 'Not authenticated' }
+
+    const file = formData.get('avatar') as File
+    if (!file || file.size === 0) return { error: 'No file selected' }
+
+    // Max 2MB
+    if (file.size > 2 * 1024 * 1024) return { error: 'Image too large (max 2MB)' }
+
+    // Validate type
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+    if (!allowed.includes(file.type)) return { error: 'Only JPG, PNG, WebP, GIF allowed' }
+
+    const ext = file.name.split('.').pop()
+    const filePath = `${user.id}/avatar.${ext}`
+
+    const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true })
+
+    if (uploadError) {
+        console.error('Avatar upload error:', uploadError)
+        return { error: 'Upload failed: ' + uploadError.message }
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath)
+
+    // Add cache-busting timestamp
+    const avatarUrl = `${publicUrl}?t=${Date.now()}`
+
+    const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: avatarUrl })
+        .eq('id', user.id)
+
+    if (updateError) {
+        console.error('Avatar URL update error:', updateError)
+        return { error: 'Could not save avatar' }
+    }
+
+    revalidatePath('/profile')
+    revalidatePath('/feed')
+    return { success: 'Profile picture updated!' }
 }
 
 export async function deleteProject(projectId: string) {

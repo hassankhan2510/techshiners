@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getProfile } from './actions'
 import styles from './profile.module.css'
 import ProfileForm from './profile-form'
+import AvatarUpload from './avatar-upload'
 
 export default async function ProfilePage() {
     const profile = await getProfile()
@@ -37,10 +38,7 @@ export default async function ProfilePage() {
 
                 <div className={styles.content}>
                     <div className={styles.avatarSection}>
-                        <div className={styles.avatar}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', background: 'var(--bg-secondary)' }} />
-                        </div>
+                        <AvatarUpload avatarUrl={avatarUrl} />
                         <div className={styles.userInfo}>
                             <h2 className={styles.name}>{profile.full_name}</h2>
                             <span className={styles.role}>{profile.role}</span>

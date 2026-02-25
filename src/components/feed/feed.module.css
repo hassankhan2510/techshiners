@@ -15,12 +15,13 @@
     border-radius: 16px;
     margin-bottom: 1rem;
     overflow: hidden;
-    transition: background 0.3s ease, box-shadow 0.2s ease;
+    transition: all 0.25s ease;
     box-shadow: var(--shadow-sm);
 }
 
 .projectCard:hover {
     box-shadow: var(--shadow-md);
+    border-color: rgba(99, 102, 241, 0.15);
 }
 
 /* ---------- Card Header ---------- */
@@ -41,9 +42,14 @@
     justify-content: center;
     font-weight: 600;
     color: var(--text-primary);
-    border: 1px solid var(--border-color);
+    border: 2px solid var(--border-color);
     overflow: hidden;
     flex-shrink: 0;
+    transition: border-color 0.2s;
+}
+
+.avatar:hover {
+    border-color: var(--accent-primary);
 }
 
 .userInfo {
@@ -61,8 +67,8 @@
 }
 
 .userUni {
-    font-size: 0.78rem;
-    color: var(--text-secondary);
+    font-size: 0.75rem;
+    color: var(--text-muted);
     margin-top: 1px;
 }
 
@@ -85,11 +91,12 @@
     cursor: pointer;
     padding: 6px;
     border-radius: 50%;
-    transition: background 0.2s;
+    transition: all 0.2s;
 }
 
 .moreBtn:hover {
     background: var(--hover-bg);
+    color: var(--text-primary);
 }
 
 /* Dropdown Menu */
@@ -103,7 +110,7 @@
     padding: 4px;
     min-width: 160px;
     z-index: 50;
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-lg);
     animation: fadeDown 0.15s ease;
 }
 
@@ -154,10 +161,10 @@
     position: absolute;
     top: 12px;
     left: 12px;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.55);
     color: #fff;
-    padding: 4px 10px;
-    border-radius: 6px;
+    padding: 4px 12px;
+    border-radius: 8px;
     font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -172,6 +179,7 @@
     height: 100%;
     width: 100%;
     color: var(--text-muted);
+    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
 }
 
 .externalLink {
@@ -201,7 +209,7 @@
 
 .projectDesc {
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     line-height: 1.55;
     margin-bottom: 0.5rem;
 }
@@ -243,8 +251,9 @@
     color: var(--accent-primary);
     padding: 3px 10px;
     border-radius: 99px;
-    font-size: 0.75rem;
-    font-weight: 500;
+    font-size: 0.73rem;
+    font-weight: 600;
+    border: 1px solid rgba(99, 102, 241, 0.1);
 }
 
 /* ---------- Actions ---------- */
@@ -259,7 +268,7 @@
 .actionBtn {
     background: none;
     border: none;
-    color: var(--text-primary);
+    color: var(--text-secondary);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -312,18 +321,19 @@
 
 .contribSubmit {
     padding: 0.5rem 1rem;
-    background: var(--accent-primary);
+    background: var(--gradient-accent);
     color: #fff;
     border: none;
     border-radius: 8px;
     font-weight: 600;
     font-size: 0.85rem;
     cursor: pointer;
-    transition: filter 0.2s;
+    transition: all 0.2s;
 }
 
 .contribSubmit:hover {
-    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--accent-glow);
 }
 
 /* Filter Tabs */
@@ -339,8 +349,8 @@
 .filterTab {
     padding: 0.45rem 1rem;
     border-radius: 99px;
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-size: 0.82rem;
+    font-weight: 600;
     white-space: nowrap;
     text-decoration: none;
     transition: all 0.2s;
@@ -351,12 +361,13 @@
 
 .filterTab:hover {
     opacity: 1 !important;
-    border-color: var(--text-muted);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
 }
 
 .filterTabActive {
-    background: var(--text-primary);
-    color: var(--bg-primary);
+    background: var(--gradient-accent);
+    color: #fff;
     border-color: transparent;
 }
 

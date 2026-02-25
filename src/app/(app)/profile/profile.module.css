@@ -32,7 +32,7 @@
 
 .cover {
     height: 100px;
-    background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+    background: var(--gradient-accent);
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -143,7 +143,7 @@
 }
 
 .button {
-    background: var(--accent-primary);
+    background: var(--gradient-accent);
     color: #fff;
     border: none;
     padding: 0.6rem 1.5rem;
@@ -151,13 +151,13 @@
     font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s;
     font-family: var(--font-sans);
 }
 
 .button:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px var(--accent-glow);
 }
 
 /* ---- Mobile First ---- */

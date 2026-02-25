@@ -14,6 +14,7 @@ export const ISLAMABAD_UNIVERSITIES = [
     "National Defence University (NDU)",
     "PIEAS (Pakistan Institute of Engineering and Applied Sciences)",
     "IST (Institute of Space Technology)",
+    "National University of Technology (NUTECH)",
     "Other"
 ] as const
 
